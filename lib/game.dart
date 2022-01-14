@@ -11,22 +11,28 @@ class Game {
     _answer = r.nextInt(maxRandom) + 1;
   }
 
+  int get answer => _answer!;
+
   int get guessCount {
     return _guessCount;
   }
+
 
   void addCountList() {
     guessCountList.add(_guessCount);
   }
 
   int doGuess(int num) {
-    _guessCount++;
     if (num > _answer!) {
+      _guessCount++;
       return 1;
     } else if (num < _answer!) {
+      _guessCount++;
       return -1;
-    } else {
+    } else{
+      _guessCount++;
       return 0;
     }
+
   }
 }
