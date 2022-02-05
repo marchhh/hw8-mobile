@@ -150,7 +150,7 @@ class HomePage extends StatelessWidget {
                         builder: (BuildContext context) {
                           if(result == 1) {
                             return AlertDialog(
-                              title: Text('RESULT'),
+                              title: Text('RESULT')
                               content: Text(input+" มากเกินไป กรุณาลองใหม่"),
                               actions: [
                                 TextButton(
