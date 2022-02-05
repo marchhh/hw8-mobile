@@ -1,81 +1,199 @@
-// ignore_for_file: avoid_print
+import 'package:flutter/material.dart';
 
-import 'dart:io';
 import 'game.dart';
 
-void main() {
-  while (true) {
-    playGame();
-    String? input;
+class Gameguessnumber extends StatefulWidget {
+  static const buttonSize = 60.0;
+  late Game _game;
 
-    do {
-      stdout.write('Play again? (Y/N): ');
-      input = stdin.readLineSync();
-    } while (input!.toLowerCase() != 'y' && input.toLowerCase() != 'n');
 
-    if (input.toLowerCase() == 'n') break;
+  Gameguessnumber({Key? key}) : super(key: key){
+    _game = Game(maxRandom: 100);
   }
 
-  print('\n\nYou\'ve played ${Game.guessCountList.length} games');
-  for (var i = 0; i < Game.guessCountList.length; i++) {
-    print('🚀 Game #${i + 1}: ${Game.guessCountList[i]} guesses');
-  }
-
-  /*var myList = [];
-  myList.add(1);
-  myList.add('hello');
-  myList.add(false);
-
-  for (var i = 0; i < myList.length; i++) {
-    print(myList[i]);
-  }
-
-  myList.forEach((item) {
-    print(item);
-  });*/
+  @override
+  State<Gameguessnumber> createState() => _GameguessnumberState();
 }
 
-void playGame() {
-  int? maxRandom;
-  do {
-    stdout.write('\nEnter a maximum number to random: ');
-    var input = stdin.readLineSync();
-    maxRandom = int.tryParse(input!);
-  } while (maxRandom == null);
+class _GameguessnumberState extends State<Gameguessnumber> {
+  String _input = '';
+  String _status = 'ทายเลข 1 ถึง 100';
 
-  var game = Game(maxRandom: maxRandom);
-  var isCorrect = false;
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('GUESS THE NUMBER'),
+      ),
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Container(
+          decoration: BoxDecoration(
+            color: Colors.purple.shade50,
+            borderRadius: BorderRadius.circular(16.0),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black12,
+                offset: Offset(5.0, 5.0),
+                spreadRadius: 2.0,
+                blurRadius: 5.0,
+              )
+            ],
+          ),
+          child: Column(
+            children: [
+              Expanded(
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Image.asset('assets/images/guess_logo.png', width: 90.0),
+                    SizedBox(width: 8.0),
+                    Column(
+                      mainAxisSize: MainAxisSize.min,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text('GUESS',
+                            style: TextStyle(
+                                fontSize: 36.0, color: Colors.purple.shade200)),
+                        Text(
+                          'THE NUMBER',
+                          style: TextStyle(
+                            fontSize: 18.0,
+                            color: Colors.purple,
+                            //fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Text(_input, style: TextStyle(fontSize: 40.0)),
+              ),
+              Padding(
+                padding: const EdgeInsets.only(bottom: 15.0,top: 15.0 ),
+                child: Text('$_status', style: TextStyle(fontSize: 20.0)),
+              ),
+              Container(
+                child: Column(
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        for(int i=1;i<=3;i++)
+                        _buildButton(i),
 
-  print('');
-  print('╔════════════════════════════════════════');
-  print('║            GUESS THE NUMBER            ');
-  print('╟────────────────────────────────────────');
+                      ],
+                    ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        for(int i=4;i<=6;i++)
+                          _buildButton(i),
+                      ],
+                    ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        for(int i=7;i<=9;i++)
+                          _buildButton(i),
+                      ],
+                    ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        _buildButton(-2),
+                        _buildButton(0),
+                        _buildButton(-1),
+                      ],
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: ElevatedButton(
+                        onPressed: () {
+                          var input = _input;
+                          var guess = int.tryParse(input);
+                          if(guess == null){
+                            showDialog(
+                              context: context,
+                              builder: (BuildContext context){
+                                return AlertDialog(
+                                  title: Text('ERROR'),
+                                  content: Text('กรอกข้อมูลไม่ถูกต้อง.'),
+                                  actions: [
+                                    TextButton(
+                                      onPressed: () {
+                                        Navigator.of(context).pop();
+                                      },
+                                      child: Text('OK'),
+                                    ),
+                                  ],
+                                );
+                              },
+                            );
+                          }
+                          var guessResult = widget._game.doGuess(guess!);
+                          if(guessResult > 0){
+                            setState(() {
+                              _status = '$guess : มากเกินไป ';
+                              _input = '';
+                            });
+                          }else if (guessResult < 0) {
+                            setState(() {
+                              _status = '$guess : น้อยเกินไป ';
+                              _input = '';
+                            });
+                          }else {
+                            setState(() {
+                              _status = '$guess : ถูกต้อง (ทาย ${widget._game.guessCount} ครั้ง)';
+                            });
+                          }
+                        },
+                        child: Text('GUESS'),
+                      ),
+                    )
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
 
-  do {
-    stdout.write('║ Guess the number between 1 and $maxRandom: ');
-    var input = stdin.readLineSync();
-    var guess = int.tryParse(input!);
-    if (guess == null) {
-      continue;
-    }
 
-    var result = game.doGuess(guess);
-
-    if (result == 1) {
-      print('║ ➜ $guess is TOO HIGH! ▲');
-      print('╟────────────────────────────────────────');
-    } else if (result == -1) {
-      print('║ ➜ $guess is TOO LOW! ▼');
-      print('╟────────────────────────────────────────');
-    } else if (result == 0) {
-      print('║ ➜ $guess is CORRECT ❤, total guesses: ${game.guessCount}');
-      print('╟────────────────────────────────────────');
-      isCorrect = true;
-      //Game.guessCountList.add(game.guessCount);
-      game.addCountList();
-    }
-  } while (!isCorrect);
-
-  print('║                 THE END                ');
-  print('╚════════════════════════════════════════');
+  Widget _buildButton(int? num) {
+    return Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: OutlinedButton(
+        onPressed: ()
+        {
+          if (num == -1) {
+            setState(() {
+              // '12345'
+              var length = _input.length;
+              _input = _input.substring(0, length - 1);
+            });
+          }else if(num == -2){
+            setState(() {
+              _input = '';
+            });
+          }else {
+            if(_input.length<3)
+              setState(() {
+                _input = _input+'$num';
+              });
+            print('You pressed $num');
+          }
+        },
+        child: (num == -1) ? Icon(Icons.backspace,)  : (num == -2) ? Icon(Icons.close): Text('$num',style: TextStyle(
+          fontSize: 25.0,
+        ),),
+      ),
+    );
+  }
 }

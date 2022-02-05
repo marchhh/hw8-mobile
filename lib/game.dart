@@ -9,30 +9,25 @@ class Game {
   Game({int maxRandom = defaultMaxRandom}) {
     var r = Random();
     _answer = r.nextInt(maxRandom) + 1;
+    print('The answer is $_answer');
   }
-
-  int get answer => _answer!;
 
   int get guessCount {
     return _guessCount;
   }
-
 
   void addCountList() {
     guessCountList.add(_guessCount);
   }
 
   int doGuess(int num) {
+    _guessCount++;
     if (num > _answer!) {
-      _guessCount++;
       return 1;
     } else if (num < _answer!) {
-      _guessCount++;
       return -1;
-    } else{
-      _guessCount++;
+    } else {
       return 0;
     }
-
   }
 }
